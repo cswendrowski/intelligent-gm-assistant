@@ -1,0 +1,93 @@
+#intelligent-gm-assistant-toggle {
+  justify-content: center;
+}
+
+#intelligent-gm-assistant .window-content {
+  background: rgba(0, 0, 0, 0);
+  padding: 0;
+  overflow: hidden;
+}
+#intelligent-gm-assistant .assistant-app {
+  height: 100%;
+}
+#intelligent-gm-assistant #iga-files {
+  color: antiquewhite;
+  flex: 1;
+  background: rgba(0, 0, 0, 0.5);
+}
+#intelligent-gm-assistant #iga-files #iga-files-list {
+  height: 687px;
+  padding: 0.5rem;
+  overflow-y: scroll;
+}
+#intelligent-gm-assistant #iga-files #iga-files-list .file-name {
+  flex: 0;
+}
+#intelligent-gm-assistant #iga-files #iga-files-list .delete {
+  float: right;
+}
+#intelligent-gm-assistant #iga-files #iga-files-list #iga-files-list-items {
+  overflow-y: scroll;
+  min-height: 2rem;
+}
+#intelligent-gm-assistant #iga-files #iga-files-list #iga-files-list-items .iga-files-list-item {
+  height: 1.5rem;
+  color: black;
+}
+#intelligent-gm-assistant #iga-files #iga-files-dropzone {
+  padding: 0.5rem;
+}
+#intelligent-gm-assistant #iga-chat {
+  flex: 2;
+  border-left: 3px rgb(128, 128, 128) solid;
+}
+#intelligent-gm-assistant #iga-chat-messages {
+  padding: 0.5rem 0 0;
+  height: 680px;
+  overflow-y: scroll;
+}
+#intelligent-gm-assistant #iga-chat-messages > hr {
+  margin-top: -7px;
+}
+#intelligent-gm-assistant #iga-chat-messages > .iga-chat-message {
+  display: flex;
+  flex-direction: row;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #000;
+  border-radius: 0.5rem;
+  background-color: whitesmoke;
+}
+#intelligent-gm-assistant #iga-chat-messages > .iga-chat-message > .message-content {
+  flex: 2;
+  user-select: all;
+}
+#intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.system, #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.assistant {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: #50ec92;
+  margin-right: 2rem;
+}
+#intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.user {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: #6cbcff;
+  margin-left: 2rem;
+  justify-content: end;
+}
+#intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.user > .message-content {
+  text-align: right;
+}
+#intelligent-gm-assistant #iga-chat-input {
+  flex: 4;
+  margin: 0.5rem;
+  background-color: whitesmoke;
+  resize: none;
+}
+#intelligent-gm-assistant #iga-chat-reset {
+  flex: 1;
+  background-color: antiquewhite;
+  margin: 0.5rem;
+}
+
+/*# sourceMappingURL=intelligent-gm-assistant.css.map */

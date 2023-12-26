@@ -1,0 +1,11 @@
+<li class="iga-chat-message message flexcol {{role}}" data-message-id="{{id}}">
+    <!--                        <div class="message-header flexrow">-->
+    <!--                            <div class="message-author">{{author}}</div>-->
+    <!--&lt;!&ndash;                            <div class="message-timestamp">{{timestamp}}</div>&ndash;&gt;-->
+    <!--                        </div>-->
+    {{#each content}}
+        {{#if this.text}}
+            <div class="message-content">{{{this.text.value}}}</div>
+        {{/if}}
+    {{/each}}
+</li>

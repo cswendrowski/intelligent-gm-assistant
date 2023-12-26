@@ -1,0 +1,59 @@
+{
+  "id": "intelligent-gm-assistant",
+  "title": "Intelligent GM Assistant",
+  "description": "An Intelligent GM Assistant to help you run your games",
+  "version": "#{VERSION}#",
+  "library": "false",
+  "manifestPlusVersion": "1.2.0",
+  "persistentStorage": true,
+  "compatibility": {
+    "minimum": 10,
+    "verified": 11,
+    "maximum": 11
+  },
+  "authors": [
+    {
+      "name": "Cody Swendrowski",
+      "discord": "cswendrowski#9701"
+    },
+    {
+      "name": "Roman Trevisanut",
+      "discord": "Cobalt#7779"
+    }
+  ],
+  "relationships": {
+    "systems": [],
+    "requires": []
+  },
+  "esmodules": [
+    "scripts/intelligent-gm-assistant.mjs"
+  ],
+  "scripts": [
+    "scripts/lib/jspdf.min.js"
+  ],
+  "styles": [
+    "styles/intelligent-gm-assistant.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "packs": [
+  ],
+  "flags": {
+    "hotReload": {
+      "extensions": ["css", "hbs", "json"],
+      "paths": ["styles", "templates", "languages"]
+    }
+  },
+  "private": false,
+  "url": "#{URL}#",
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
+  "license": "LICENSE",
+  "readme": "README.md",
+  "media": []
+}

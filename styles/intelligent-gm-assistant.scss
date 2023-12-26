@@ -1,0 +1,115 @@
+#intelligent-gm-assistant-toggle {
+  justify-content: center;
+}
+
+#intelligent-gm-assistant {
+
+  .window-content {
+    background: rgba(0, 0, 0, 0);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .assistant-app {
+    height: 100%;
+  }
+
+  #iga-files {
+    color: antiquewhite;
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+
+    #iga-files-list {
+      height: 687px;
+      padding: 0.5rem;
+      overflow-y: scroll;
+
+      .file-name {
+        flex: 0;
+      }
+
+      .delete {
+        float: right;
+      }
+
+      #iga-files-list-items {
+        overflow-y: scroll;
+        min-height: 2rem;
+
+        .iga-files-list-item {
+          height: 1.5rem;
+          color: black;
+        }
+      }
+    }
+
+    #iga-files-dropzone {
+      padding: 0.5rem;
+    }
+  }
+
+  #iga-chat {
+    flex: 2;
+    border-left: 3px rgb(128, 128, 128) solid;
+  }
+
+  #iga-chat-messages {
+    padding: 0.5rem 0 0;
+    height: 680px;
+    overflow-y: scroll;
+
+    > hr {
+      margin-top: -7px;
+    }
+
+    > .iga-chat-message {
+      display: flex;
+      flex-direction: row;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid #000;
+      border-radius: 0.5rem;
+      background-color: whitesmoke;
+
+      > .message-content {
+        flex: 2;
+        user-select: all;
+      }
+
+      &.system, &.assistant {
+        // Make the bubble look like a left chat bubble
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        background-color: #50ec92;
+        margin-right: 2rem;
+      }
+
+      &.user {
+        // Make the bubble look like a left chat bubble
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        background-color: #6cbcff;
+        margin-left: 2rem;
+        justify-content: end;
+        // Align text to the right
+        > .message-content {
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  #iga-chat-input {
+    flex: 4;
+    margin: 0.5rem;
+    background-color: whitesmoke;
+    //width: 96%;
+    resize: none;
+  }
+
+  #iga-chat-reset {
+    flex: 1;
+    background-color: antiquewhite;
+    margin: 0.5rem;
+  }
+}

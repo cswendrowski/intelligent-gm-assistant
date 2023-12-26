@@ -1,0 +1,52 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <article class="assistant-app flexrow">
+        <section id="iga-files">
+<!--            <h2>Files</h2>-->
+            <div id="iga-files-list" class="flexcol">
+            {{#each files as |file|}}
+                <h3 class="file-name">File {{file.index}} <a class="delete" data-action="removeFile" data-id="{{file.id}}"><i class="fas fa-delete-left"></i></a></h3>
+                <ol id="iga-files-list-items">
+                    {{#each file.journals as |journal|}}
+                        <li class="iga-files-list-item flexrow" data-journal-id="{{journal.id}}">
+                            <div class="iga-files-list-item-name"><a class="content-link" draggable="false" data-uuid="JournalEntry.{{journal.id}}" data-id="{{journal.id}}" data-type="JournalEntry" data-tooltip="Journal Entry"><i class="fas fa-book-open"></i>{{journal.name}}</a></div>
+                        </li>
+                    {{/each}}
+                </ol>
+            {{/each}}
+            </div>
+            <hr>
+            <!-- Add a dropzone for files -->
+            <div id="iga-files-dropzone" class="flexcol">
+                {{#unless maxFiles}}
+                <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Drop Folders or Journals here to upload ({{uploadedFiles}}/20)</div>
+                {{else}}
+                <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Max files uploaded, delete an existing one to upload a new one</div>
+                {{/unless}}
+            </div>
+        </section>
+        <section id="iga-chat">
+            <ol id="iga-chat-messages">
+                {{#each messages as |message|}}
+                    <li class="iga-chat-message message flexcol {{message.role}}" data-message-id="{{message.id}}">
+<!--                        <div class="message-header flexrow">-->
+<!--                            <div class="message-author">{{message.author}}</div>-->
+<!--&lt;!&ndash;                            <div class="message-timestamp">{{message.timestamp}}</div>&ndash;&gt;-->
+<!--                        </div>-->
+                        {{#each message.content}}
+                            {{#if this.text}}
+                                <div class="message-content">{{{this.text.value}}}</div>
+                            {{/if}}
+                        {{/each}}
+                    </li>
+                {{/each}}
+            </ol>
+            <hr>
+            <div class="iga-chat-controls flexrow">
+                <form id="iga-chat-form">
+                    <textarea id="iga-chat-input" placeholder="Ask a question..." autocomplete="off" draggable="false"></textarea>
+                </form>
+                <button id="iga-chat-reset" class="button" type="submit" form="iga-chat-form">Reset <i class="fas fa-trash"></i></button>
+            </div>
+        </section>
+    </article>
+</form>
