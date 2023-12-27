@@ -1,5 +1,7 @@
 export async function ready() {
 
+    if ( !game.user.isGM ) return;
+
     await createOrGetThread();
 }
 

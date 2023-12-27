@@ -145,7 +145,7 @@ export default class API {
         while ( status === "in_progress" ) {
             await new Promise(r => setTimeout(r, 2 * 1000));
             const runStatus = await this.getRunStatus(threadId, runId);
-            console.log(runStatus);
+            //console.log(runStatus);
             status = runStatus.status;
             if ( stepListener ) stepListener(runStatus.step);
         }

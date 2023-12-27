@@ -4,6 +4,9 @@ export function renderHotbar(app, html, context) {
 
     // Attach a button to the right of the hotbar which allows the GM to toggle the Intelligent GM Assistant
 
+    // If not GM, do nothing
+    if ( !game.user.isGM ) return;
+
     const toAppend =
         $(`<div id="intelligent-gm-assistant-toggle" class="bar-controls flexcol" data-tooltip-direction="UP">
             <a class="page-control" data-tooltip="Toggle Intelligent GM Assistant">
