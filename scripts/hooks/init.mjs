@@ -11,7 +11,7 @@ export async function init() {
         default: "",
         config: true,
         type: String,
-        reload: true,
+        requiresReload: true,
     });
 
     game.settings.register("intelligent-gm-assistant", "threadId", {

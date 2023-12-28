@@ -65,13 +65,13 @@
 #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.system, #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.assistant {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  background-color: #50ec92;
+  background-color: #8bdbac;
   margin-right: 2rem;
 }
 #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.user {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-  background-color: #6cbcff;
+  background-color: #9ad1ff;
   margin-left: 2rem;
   justify-content: end;
 }

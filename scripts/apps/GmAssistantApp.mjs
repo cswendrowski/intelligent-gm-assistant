@@ -16,11 +16,30 @@ export default class GmAssistantApp extends Application {
     messages = [];
     disabled = false;
     canUpload = true;
+    hasPremium = false;
 
     /* -------------------------------------------- */
 
     async getData(options) {
         const data = super.getData(options);
+
+        const accountStatus = await game.modules.get("intelligent-gm-assistant").api.getAccountStatus();
+        this.hasPremium = accountStatus.hasPremium;
+        if (!accountStatus.hasPremium) {
+            data.messages = [
+                {
+                    "id": foundry.utils.randomID(),
+                    "role": "system",
+                    "content": [{
+                        "text": {
+                            "value": "You must be a Gold Patreon supporter to use the Intelligent GM Assistant Beta. Please visit https://www.patreon.com/ironmoose to become a supporter. General access will be available soon."
+                        }
+                    }],
+                    "created_at": Date.now() / 1000
+                },
+            ];
+            return data;
+        }
 
         const threadId = game.settings.get("intelligent-gm-assistant", "threadId");
 
@@ -127,14 +146,14 @@ export default class GmAssistantApp extends Application {
     /**
      * Disable the ability to interact while waiting on an action
      */
-    disableInteraction() {
+    disableInteraction(reason="Waiting...") {
         this.disabled = true;
 
         // Gray out and disable the chat input
         const chatInput = this._element.find("#iga-chat-input");
         chatInput.attr("disabled", true);
         chatInput.css("background-color", "#eee");
-        chatInput.attr("placeholder", "Waiting...");
+        chatInput.attr("placeholder", reason);
 
         // Disable the reset button
         const resetButton = this._element.find("#iga-chat-reset");
@@ -147,13 +166,17 @@ export default class GmAssistantApp extends Application {
 
         // Update the text of the files dropzone
         const fileUploadDropzoneText = this._element.find("#iga-files-dropzone-text");
-        fileUploadDropzoneText.text("Waiting...");
+        fileUploadDropzoneText.text(reason);
     }
 
     /* -------------------------------------------- */
 
     activateListeners(html) {
         super.activateListeners(html);
+        if (!this.hasPremium) {
+            this.disableInteraction("You must be a Gold Patreon supporter to use the Intelligent GM Assistant Beta.");
+            return;
+        }
         this.disabled = false;
 
         html.find('a').click(ev => {
@@ -364,6 +387,7 @@ export default class GmAssistantApp extends Application {
                         "": "Thinking...",
                         "tool_calls": "Consulting attached Resources...",
                         "message_creation": "Responding...",
+                        "completed": "Responding...",
                     }
                     thinkingMessageElement.find(".message-content")[0].innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${stepToMessage[currentStep]}`;
                 }

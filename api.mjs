@@ -105,6 +105,16 @@ export default class API {
 
     /* -------------------------------------------- */
 
+    async getAccountStatus() {
+        const response = await this.callApi("/AccountStatus", JSON.stringify({}), {
+            method: "GET",
+            deserializeResult: true
+        });
+        return response;
+    }
+
+    /* -------------------------------------------- */
+
     async createThread() {
         const response = await this.callApi("/AssistantThreadCreate", JSON.stringify({}));
         return response.id;
