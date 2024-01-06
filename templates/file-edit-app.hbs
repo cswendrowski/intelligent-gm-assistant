@@ -1,0 +1,29 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <h2><input name="name" type="text" placeholder="{{file.name}}" value="{{file.name}}" /></h2>
+    <h3>Permissions</h3>
+    <div class="form-group">
+        <label>Role</label>
+        <select id="role" name="role" data-dtype="String">
+            {{#select file.role}}
+            <option value="PLAYER">Players</option>
+            <option value="TRUSTED">Trusted Players</option>
+            <option value="ASSISTANT">GM Assistants</option>
+            <option value="GAMEMASTER">Gamemasters</option>
+            {{/select}}
+        </select>
+        <p class="notes">What is the minimum role that should have access to this file?</p>
+    </div>
+    <div class="form-group-stacked">
+        <label>Users</label>
+        <!-- Render a list of checkboxes for each user -->
+        <div class="form-fields">
+            {{#each users as |user|}}
+            <div class="form-group">
+                <input type="checkbox" name="user-{{user.id}}" data-dtype="String" data-role="{{user.role}}" class="user" {{#if user.hasAccess}}checked{{/if}} {{#if user.hasDefaultAccess}}disabled="true" data-tooltip="User has access via the Minimum Role" {{/if}} />
+                <label>{{user.name}}</label>
+            </div>
+            {{/each}}
+        </div>
+        <p class="notes">Which users should have access to this file?</p>
+    </div>
+</form>

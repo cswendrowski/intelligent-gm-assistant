@@ -15,7 +15,7 @@ export async function init() {
     });
 
     game.settings.register("intelligent-gm-assistant", "threadId", {
-        scope: "world",
+        scope: "user",
         default: "",
         config: false,
         type: String

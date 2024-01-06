@@ -228,7 +228,7 @@ export default class API {
 
     /* -------------------------------------------- */
 
-    async journalsToPDF(journals) {
+    async journalsToPDF(journals, name="") {
         const process = await ui.notifications.info("Processing Journals...", {permanent: false, buttons: {}});
         const pageWidth = 8.5,
             lineHeight = 1.2,
@@ -310,6 +310,8 @@ export default class API {
         // console.log(fileId);
         const fileMapping = game.settings.get("intelligent-gm-assistant", "fileMapping");
         fileMapping[fileId] = journalPageMapping;
+        fileMapping[fileId].name = name ? name : journals[0].name;
+        fileMapping[fileId].role = "GAMEMASTER";
         game.settings.set("intelligent-gm-assistant", "fileMapping", fileMapping);
     }
 

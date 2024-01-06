@@ -74,6 +74,10 @@
       > .message-content {
         flex: 2;
         user-select: all;
+
+        * {
+          user-select: all;
+        }
       }
 
       &.system, &.assistant {

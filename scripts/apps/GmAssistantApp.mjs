@@ -1,3 +1,5 @@
+import FileEditApp from "./FileEditApp.mjs";
+
 export default class GmAssistantApp extends Application {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
@@ -45,24 +47,43 @@ export default class GmAssistantApp extends Application {
 
         const fileMapping = game.settings.get("intelligent-gm-assistant", "fileMapping") || {};
 
+        // If any files don't have a name, set it to File + index
+        for (let f of Object.keys(fileMapping)) {
+            if (!fileMapping[f].name) {
+                fileMapping[f].name = `File ${Object.keys(fileMapping).indexOf(f) + 1}`;
+            }
+        }
+        game.settings.set("intelligent-gm-assistant", "fileMapping", fileMapping);
+
         // Tranform into an array of objects
+        const visibilityIcons = {
+            "GAMEMASTER": "fas fa-eye-slash",
+            "ASSISTANT": "fas fa-user-shield",
+            "TRUSTED": "fas fa-user-check",
+            "PLAYER": "fas fa-globe",
+        };
+        const keysToSkip = ["writtenText", "name", "role", "users", "permissions"];
         const fileMappingArray = Object.keys(fileMapping).map( (k, i) => {
+            if ( game.user.role < CONST.USER_ROLES[fileMapping[k].role] && !fileMapping[k].users?.includes(game.user.id)) return null;
             return {
                 "id": k,
-                "index": i + 1,
-                "journals": Object.keys(fileMapping[k]).filter(j => j !== "writtenText").map(j => {
+                "name": fileMapping[k].name,
+                "visibility": visibilityIcons[fileMapping[k].role],
+                "role": fileMapping[k].role,
+                "journals": Object.keys(fileMapping[k]).filter(j => !keysToSkip.includes(j)).map(j => {
                     return {
                         "id": j,
                         "name": fileMapping[k][j].name
                     }
                 })
             }
-        });
+        }).filter(f => f !== null);
         //console.log(fileMappingArray);
         data.files = fileMappingArray;
         data.uploadedFiles = Object.keys(fileMapping).length;
         data.maxFiles = data.files.length >= 20;
-        this.canUpload = !data.maxFiles;
+        data.isGm = game.user.isGM;
+        this.canUpload = game.user.isGM && !data.maxFiles;
 
         try {
             const threadMessages = await game.modules.get("intelligent-gm-assistant").api.getMessages(threadId);
@@ -273,7 +294,7 @@ export default class GmAssistantApp extends Application {
             }
         }
         visitFolder(folder);
-        await game.modules.get("intelligent-gm-assistant").api.journalsToPDF(journals);
+        await game.modules.get("intelligent-gm-assistant").api.journalsToPDF(journals, folder.name);
     }
 
     /* -------------------------------------------- */
@@ -283,6 +304,7 @@ export default class GmAssistantApp extends Application {
         const id = ev.currentTarget.dataset.id;
 
         switch (action) {
+            case "editFile": return this._editFile(id);
             case "removeFile": return this._removeFile(id);
             case "openPage": return this._openPage(id, ev.currentTarget.dataset.pageid);
         }
@@ -294,6 +316,14 @@ export default class GmAssistantApp extends Application {
         game.journal.get(journalId).sheet._render(true).then(() => {
             game.journal.get(journalId).sheet.render(true, {pageId: pageId});
         });
+    }
+
+    /* -------------------------------------------- */
+
+    async _editFile(id) {
+        // Open the File Edit application
+        const fileEditApp = new FileEditApp(id, () => this.render(true));
+        fileEditApp.render(true);
     }
 
     /* -------------------------------------------- */
@@ -392,10 +422,11 @@ export default class GmAssistantApp extends Application {
                     thinkingMessageElement.find(".message-content")[0].innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${stepToMessage[currentStep]}`;
                 }
                 const fileMapping = game.settings.get("intelligent-gm-assistant", "fileMapping");
+                const visibleFiles = Object.keys(fileMapping).filter(f => game.user.role >= CONST.USER_ROLES[fileMapping[f].role] || fileMapping[f].users?.includes(game.user.id));
                 game.modules.get("intelligent-gm-assistant").api.addMessage(threadId, updateThinkingMessage, {
                     "role": "user",
                     "content": message,
-                    "file_ids": fileMapping ? Object.keys(fileMapping) : [],
+                    "file_ids": visibleFiles ? visibleFiles : [],
                 }).then(() => {
                     this.messages = [];
                     userMessageElement.remove();

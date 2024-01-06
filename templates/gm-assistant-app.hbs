@@ -4,7 +4,9 @@
 <!--            <h2>Files</h2>-->
             <div id="iga-files-list" class="flexcol">
             {{#each files as |file|}}
-                <h3 class="file-name">File {{file.index}} <a class="delete" data-action="removeFile" data-id="{{file.id}}"><i class="fas fa-delete-left"></i></a></h3>
+                <h3 class="file-name">
+                    {{#if ../isGm}}<a class="edit" data-action="editFile" data-id="{{file.id}}" data-tooltip="Edit"><i class="fas fa-edit"></i></a>{{/if}} <i class="{{file.visibility}}" data-tooltip="{{file.role}}"></i> {{file.name}} {{#if ../isGm}}<a class="delete" data-action="removeFile" data-id="{{file.id}}" data-tooltip="Delete"><i class="fas fa-delete-left"></i></a>{{/if}}
+                </h3>
                 <ol id="iga-files-list-items">
                     {{#each file.journals as |journal|}}
                         <li class="iga-files-list-item flexrow" data-journal-id="{{journal.id}}">
@@ -17,11 +19,13 @@
             <hr>
             <!-- Add a dropzone for files -->
             <div id="iga-files-dropzone" class="flexcol">
-                {{#unless maxFiles}}
-                <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Drop Folders or Journals here to upload ({{uploadedFiles}}/20)</div>
+                {{#if maxFiles}}
+                    <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Max files uploaded, delete an existing one to upload a new one</div>
+                {{else if isGm}}
+                    <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Drop Folders or Journals here to upload ({{uploadedFiles}}/20)</div>
                 {{else}}
-                <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Max files uploaded, delete an existing one to upload a new one</div>
-                {{/unless}}
+                    <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Only a GM or GM Assistant can upload files</div>
+                {{/if}}
             </div>
         </section>
         <section id="iga-chat">
