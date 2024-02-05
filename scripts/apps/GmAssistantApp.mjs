@@ -27,6 +27,7 @@ export default class GmAssistantApp extends Application {
 
         const accountStatus = await game.modules.get("intelligent-gm-assistant").api.getAccountStatus();
         this.hasPremium = accountStatus.hasPremium;
+        const maxAllowedFiles = accountStatus.maxGmAssistantFiles;
         if (!accountStatus.hasPremium) {
             data.messages = [
                 {
@@ -43,7 +44,8 @@ export default class GmAssistantApp extends Application {
             return data;
         }
 
-        const threadId = game.settings.get("intelligent-gm-assistant", "threadId");
+        const threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
+        const threadId = threadIds[game.user.id];
 
         const fileMapping = game.settings.get("intelligent-gm-assistant", "fileMapping") || {};
 
@@ -73,7 +75,9 @@ export default class GmAssistantApp extends Application {
                 "journals": Object.keys(fileMapping[k]).filter(j => !keysToSkip.includes(j)).map(j => {
                     return {
                         "id": j,
-                        "name": fileMapping[k][j].name
+                        "name": fileMapping[k][j].name,
+                        "isCompendium": fileMapping[k][j].isCompendium,
+                        "pack": fileMapping[k][j].pack,
                     }
                 })
             }
@@ -81,7 +85,8 @@ export default class GmAssistantApp extends Application {
         //console.log(fileMappingArray);
         data.files = fileMappingArray;
         data.uploadedFiles = Object.keys(fileMapping).length;
-        data.maxFiles = data.files.length >= 20;
+        data.maxFiles = data.files.length >= maxAllowedFiles;
+        data.maxAllowedFiles = maxAllowedFiles;
         data.isGm = game.user.isGM;
         this.canUpload = game.user.isGM && !data.maxFiles;
 
@@ -114,6 +119,12 @@ export default class GmAssistantApp extends Application {
                             const citationReplacement = `<span class="citation" data-tooltip="${quote}">【${pageLink}${citationTextWithoutBrackets}】</span>`;
                             c.text.value = c.text.value.replaceAll(citationText, citationReplacement);
                         }
+
+                        // Find any 【13†source】 remaining and remove them
+                        c.text.value = c.text.value.replaceAll(/【\d+†\w+】/g, "");
+
+                        // Might also be of the form 【20:7†source】
+                        c.text.value = c.text.value.replaceAll(/【\d+:\d+†\w+】/g, "");
                     }
                 }
             }
@@ -220,6 +231,27 @@ export default class GmAssistantApp extends Application {
             chatInput.focus();
         }
         chatInput.on('keydown', this.onKeydown(html, chatInput));
+        this._contextMenu(html);
+    }
+
+    /* -------------------------------------------- */
+
+    _contextMenu(html) {
+        // Attach a context menu to the chat messages
+        ContextMenu.create(this, html, ".message", [
+            {
+                name: "Sent to Chat",
+                icon: '<i class="fas fa-comment"></i>',
+                condition: li => li.hasClass("assistant"),
+                callback: li => {
+                    ChatMessage.create({
+                        user: game.user.id,
+                        speaker: ChatMessage.getSpeaker({alias: "Intelligent GM Assistant"}),
+                        content: li.find(".message-content")[0].innerHTML,
+                        type: CONST.CHAT_MESSAGE_TYPES.OOC,
+                    });
+                }
+            }]);
     }
 
     /* -------------------------------------------- */
@@ -231,18 +263,39 @@ export default class GmAssistantApp extends Application {
         event.preventDefault();
         event.stopPropagation();
 
-        //console.log(event);
+        //console.dir(event);
 
-        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        //console.log(data);
+        if (event.dataTransfer.types.includes("text/plain")) {
+            const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+            //console.dir(data);
 
-        switch (data.type) {
-            case "JournalEntry":
-                await this._handleJournalDrop(data);
-                break;
-            case "Folder":
-                await this._handleFolderDrop(data);
-                break;
+            switch (data.type) {
+                case "JournalEntry":
+                    await this._handleJournalDrop(data);
+                    break;
+                case "Folder":
+                    await this._handleFolderDrop(data);
+                    break;
+                case "Compendium":
+                    await this._handleCompendiumDrop(data);
+            }
+        }
+        else if (event.dataTransfer.files.length > 0) {
+            const files = Array.from(event.dataTransfer.files);
+            //console.dir(files);
+            const pdfs = files.filter(f => f.type === "application/pdf");
+            if (pdfs.length > 0) {
+                for (const pdf of pdfs) {
+                    const fileId = await game.modules.get("intelligent-gm-assistant")["api"].uploadPdf(pdf);
+                    // console.log(fileId);
+                    const fileMapping = game.settings.get("intelligent-gm-assistant", "fileMapping");
+                    fileMapping[fileId] = {};
+                    fileMapping[fileId].name = pdf.name.replace(".pdf", "")
+                        .replaceAll("_", " ").replaceAll("-", " ");
+                    fileMapping[fileId].role = "GAMEMASTER";
+                    game.settings.set("intelligent-gm-assistant", "fileMapping", fileMapping);
+                }
+            }
         }
 
         this.render(true);
@@ -262,7 +315,9 @@ export default class GmAssistantApp extends Application {
             await game.modules.get("intelligent-gm-assistant").api.deleteThread(currentThreadId);
         }
         const newThreadId = await game.modules.get("intelligent-gm-assistant").api.createThread();
-        await game.settings.set("intelligent-gm-assistant", "threadId", newThreadId);
+        let currentThreadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
+        currentThreadIds[game.user.id] = newThreadId;
+        await game.settings.set("intelligent-gm-assistant", "threadIds", currentThreadIds);
         // Wait for the thread to be created before resetting the messages
         await new Promise(resolve => setTimeout(resolve, 1000));
         this.messages = [];
@@ -295,6 +350,17 @@ export default class GmAssistantApp extends Application {
         }
         visitFolder(folder);
         await game.modules.get("intelligent-gm-assistant").api.journalsToPDF(journals, folder.name);
+    }
+
+    /* -------------------------------------------- */
+
+    async _handleCompendiumDrop(data) {
+        const compendiumId = data.id;
+        const compendium = game.packs.get(compendiumId);
+        console.dir(compendium);
+        if ( !compendium.metadata.type === "JournalEntry" ) return;
+        const entries = await compendium.getDocuments();
+        await game.modules.get("intelligent-gm-assistant").api.journalsToPDF(entries, compendium.metadata.label, compendium.metadata.id);
     }
 
     /* -------------------------------------------- */
@@ -346,7 +412,7 @@ export default class GmAssistantApp extends Application {
 
     onKeydown(html, chatInput) {
         return async ev => {
-            if (ev.keyCode === 13) {
+            if (ev.keyCode === 13 && !ev.shiftKey) {
                 this.disableInteraction();
                 ev.preventDefault();
                 ev.stopPropagation();

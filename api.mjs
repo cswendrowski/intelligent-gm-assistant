@@ -228,7 +228,7 @@ export default class API {
 
     /* -------------------------------------------- */
 
-    async journalsToPDF(journals, name="") {
+    async journalsToPDF(journals, name="", pack="") {
         const process = await ui.notifications.info("Processing Journals...", {permanent: false, buttons: {}});
         const pageWidth = 8.5,
             lineHeight = 1.2,
@@ -253,7 +253,9 @@ export default class API {
         for (let journal of journals) {
             journalPageMapping[journal.id] = {
                 startIndex: writtenText.length,
-                pages: {}
+                pages: {},
+                isCompendium: pack !== "",
+                pack: pack
             };
             for (let page of journal.pages) {
                 if (!firstPage) doc.addPage("a4", "1");
@@ -303,7 +305,7 @@ export default class API {
         journalPageMapping.writtenText = writtenText;
 
         //console.log(journalPageMapping);
-        //doc.save(`Journals.pdf`);
+        //doc.save(`${name ?? "Journals"}.pdf`);
 
         // Upload to the API
         const fileId = await game.modules.get("intelligent-gm-assistant")["api"].uploadPdf(doc.output("blob"));

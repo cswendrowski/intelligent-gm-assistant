@@ -60,10 +60,10 @@
 }
 #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message > .message-content {
   flex: 2;
-  user-select: all;
+  user-select: text;
 }
 #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message > .message-content * {
-  user-select: all;
+  user-select: text;
 }
 #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.system, #intelligent-gm-assistant #iga-chat-messages > .iga-chat-message.assistant {
   border-top-left-radius: 0;

@@ -73,10 +73,10 @@
 
       > .message-content {
         flex: 2;
-        user-select: all;
+        user-select: text;
 
         * {
-          user-select: all;
+          user-select: text;
         }
       }
 

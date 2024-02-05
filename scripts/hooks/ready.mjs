@@ -4,10 +4,19 @@ export async function ready() {
 }
 
 async function createOrGetThread() {
-    let threadId = game.settings.get("intelligent-gm-assistant", "threadId");
+    let oldThreadId = game.settings.get("intelligent-gm-assistant", "threadId");
+    let threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
 
-    if (!threadId) {
-        threadId = await game.modules.get("intelligent-gm-assistant").api.createThread();
-        game.settings.set("intelligent-gm-assistant", "threadId", threadId);
+    let userThreadId = threadIds[game.user.id] || "";
+    if (!userThreadId && oldThreadId) {
+        threadIds[game.user.id] = oldThreadId;
+        game.settings.set("intelligent-gm-assistant", "threadIds", threadIds);
+        game.settings.set("intelligent-gm-assistant", "threadId", undefined);
+        console.log("Migrated threadId to threadIds")
+    }
+    else if (!userThreadId) {
+        userThreadId = await game.modules.get("intelligent-gm-assistant").api.createThread();
+        threadIds[game.user.id] = userThreadId;
+        game.settings.set("intelligent-gm-assistant", "threadIds", threadIds);
     }
 }

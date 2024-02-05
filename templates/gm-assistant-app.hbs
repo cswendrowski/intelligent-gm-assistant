@@ -10,7 +10,13 @@
                 <ol id="iga-files-list-items">
                     {{#each file.journals as |journal|}}
                         <li class="iga-files-list-item flexrow" data-journal-id="{{journal.id}}">
-                            <div class="iga-files-list-item-name"><a class="content-link" draggable="false" data-uuid="JournalEntry.{{journal.id}}" data-id="{{journal.id}}" data-type="JournalEntry" data-tooltip="Journal Entry"><i class="fas fa-book-open"></i>{{journal.name}}</a></div>
+                            <div class="iga-files-list-item-name">
+                                {{#if journal.isCompendium}}
+                                    <a class="content-link" draggable="false" data-uuid="Compendium.{{journal.pack}}.{{journal.id}}" data-id="{{journal.id}}" data-type="JournalEntry" data-tooltip="Journal Entry" data-pack="{{journal.pack}}"><i class="fas fa-book-open"></i>{{journal.name}}</a>
+                                {{else}}
+                                    <a class="content-link" draggable="false" data-uuid="JournalEntry.{{journal.id}}" data-id="{{journal.id}}" data-type="JournalEntry" data-tooltip="Journal Entry"><i class="fas fa-book-open"></i>{{journal.name}}</a>
+                                {{/if}}
+                            </div>
                         </li>
                     {{/each}}
                 </ol>
@@ -22,7 +28,7 @@
                 {{#if maxFiles}}
                     <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Max files uploaded, delete an existing one to upload a new one</div>
                 {{else if isGm}}
-                    <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Drop Folders or Journals here to upload ({{uploadedFiles}}/20)</div>
+                    <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Drop Folders or Journals here to upload ({{uploadedFiles}}/{{maxAllowedFiles}})</div>
                 {{else}}
                     <div id="iga-files-dropzone-text"><i class="fas fa-file-upload"></i> Only a GM or GM Assistant can upload files</div>
                 {{/if}}

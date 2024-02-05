@@ -21,6 +21,13 @@ export async function init() {
         type: String
     });
 
+    game.settings.register("intelligent-gm-assistant", "threadIds", {
+        scope: "world",
+        default: {},
+        config: false,
+        type: Object
+    });
+
     game.settings.register("intelligent-gm-assistant", "fileMapping", {
         scope: "world",
         default: {},
