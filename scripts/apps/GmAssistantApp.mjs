@@ -304,7 +304,8 @@ export default class GmAssistantApp extends Application {
     /* -------------------------------------------- */
 
     async _handleResetClick(ev) {
-        const currentThreadId = game.settings.get("intelligent-gm-assistant", "threadId");
+        const threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
+        const currentThreadId = threadIds[game.user.id];
         if (currentThreadId) {
             const confirm = await Dialog.confirm({
                 title: "Reset Conversation",
@@ -477,7 +478,8 @@ export default class GmAssistantApp extends Application {
                 //
                 // this.render(true);
 
-                const threadId = game.settings.get("intelligent-gm-assistant", "threadId");
+                const threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
+                const threadId = threadIds[game.user.id];
                 const updateThinkingMessage = (currentStep) => {
                     const stepToMessage = {
                         "": "Thinking...",
