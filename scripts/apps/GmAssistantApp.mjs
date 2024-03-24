@@ -18,7 +18,6 @@ export default class GmAssistantApp extends Application {
     messages = [];
     disabled = false;
     canUpload = true;
-    hasPremium = false;
 
     /* -------------------------------------------- */
 
@@ -26,26 +25,10 @@ export default class GmAssistantApp extends Application {
         const data = super.getData(options);
 
         const accountStatus = await game.modules.get("intelligent-gm-assistant").api.getAccountStatus();
-        this.hasPremium = accountStatus.hasPremium;
         const maxAllowedFiles = accountStatus.maxGmAssistantFiles;
-        if (!accountStatus.hasPremium) {
-            data.messages = [
-                {
-                    "id": foundry.utils.randomID(),
-                    "role": "system",
-                    "content": [{
-                        "text": {
-                            "value": "You must be a Gold Patreon supporter to use the Intelligent GM Assistant Beta. Please visit https://www.patreon.com/ironmoose to become a supporter. General access will be available soon."
-                        }
-                    }],
-                    "created_at": Date.now() / 1000
-                },
-            ];
-            return data;
-        }
 
-        const threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
-        const threadId = threadIds[game.user.id];
+        const threadIds = game.settings.get("intelligent-gm-assistant", "userThreadIds");
+        const threadId = threadIds[game.world.id];
 
         const fileMapping = game.settings.get("intelligent-gm-assistant", "fileMapping") || {};
 
@@ -205,10 +188,6 @@ export default class GmAssistantApp extends Application {
 
     activateListeners(html) {
         super.activateListeners(html);
-        if (!this.hasPremium) {
-            this.disableInteraction("You must be a Gold Patreon supporter to use the Intelligent GM Assistant Beta.");
-            return;
-        }
         this.disabled = false;
 
         html.find('a').click(ev => {
@@ -304,8 +283,8 @@ export default class GmAssistantApp extends Application {
     /* -------------------------------------------- */
 
     async _handleResetClick(ev) {
-        const threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
-        const currentThreadId = threadIds[game.user.id];
+        const threadIds = game.settings.get("intelligent-gm-assistant", "userThreadIds");
+        const currentThreadId = threadIds[game.world.id];
         if (currentThreadId) {
             const confirm = await Dialog.confirm({
                 title: "Reset Conversation",
@@ -316,9 +295,9 @@ export default class GmAssistantApp extends Application {
             await game.modules.get("intelligent-gm-assistant").api.deleteThread(currentThreadId);
         }
         const newThreadId = await game.modules.get("intelligent-gm-assistant").api.createThread();
-        let currentThreadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
-        currentThreadIds[game.user.id] = newThreadId;
-        await game.settings.set("intelligent-gm-assistant", "threadIds", currentThreadIds);
+        let currentThreadIds = game.settings.get("intelligent-gm-assistant", "userThreadIds");
+        currentThreadIds[game.world.id] = newThreadId;
+        await game.settings.set("intelligent-gm-assistant", "userThreadIds", currentThreadIds);
         // Wait for the thread to be created before resetting the messages
         await new Promise(resolve => setTimeout(resolve, 1000));
         this.messages = [];
@@ -478,8 +457,8 @@ export default class GmAssistantApp extends Application {
                 //
                 // this.render(true);
 
-                const threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
-                const threadId = threadIds[game.user.id];
+                const threadIds = game.settings.get("intelligent-gm-assistant", "userThreadIds");
+                const threadId = threadIds[game.world.id];
                 const updateThinkingMessage = (currentStep) => {
                     const stepToMessage = {
                         "": "Thinking...",

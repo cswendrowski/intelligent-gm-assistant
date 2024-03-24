@@ -5,18 +5,27 @@ export async function ready() {
 
 async function createOrGetThread() {
     let oldThreadId = game.settings.get("intelligent-gm-assistant", "threadId");
-    let threadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
+    let worldThreadIds = game.settings.get("intelligent-gm-assistant", "threadIds");
+    let userThreadId = worldThreadIds[game.user.id] || "";
+    let userThreadIds = game.settings.get("intelligent-gm-assistant", "userThreadIds");
+    let userThreadWorldId = userThreadIds[game.world.id];
 
-    let userThreadId = threadIds[game.user.id] || "";
-    if (!userThreadId && oldThreadId) {
-        threadIds[game.user.id] = oldThreadId;
-        game.settings.set("intelligent-gm-assistant", "threadIds", threadIds);
+    if (oldThreadId) {
+        userThreadIds[game.world.id] = oldThreadId;
         game.settings.set("intelligent-gm-assistant", "threadId", undefined);
-        console.log("Migrated threadId to threadIds")
+        game.settings.set("intelligent-gm-assistant", "userThreadIds", userThreadIds);
+        console.log("Migrated threadId to userThreadIds");
     }
-    else if (!userThreadId) {
+    else if (userThreadId) {
+        userThreadIds[game.world.id] = userThreadId;
+        delete worldThreadIds[game.user.id];
+        game.settings.set("intelligent-gm-assistant", "threadIds", worldThreadIds);
+        game.settings.set("intelligent-gm-assistant", "userThreadIds", userThreadIds);
+        console.log("Migrated world threadId to userThreadIds");
+    }
+    else if (!userThreadWorldId) {
         userThreadId = await game.modules.get("intelligent-gm-assistant").api.createThread();
-        threadIds[game.user.id] = userThreadId;
-        game.settings.set("intelligent-gm-assistant", "threadIds", threadIds);
+        userThreadIds[game.world.id] = userThreadId;
+        game.settings.set("intelligent-gm-assistant", "userThreadIds", userThreadIds);
     }
 }
