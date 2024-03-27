@@ -1,5 +1,3 @@
-import GmAssistantApp from "../apps/GmAssistantApp.mjs";
-
 export function renderHotbar(app, html, context) {
 
     // Attach a button to the right of the hotbar which allows the GM to toggle the Intelligent GM Assistant
@@ -13,13 +11,8 @@ export function renderHotbar(app, html, context) {
     html.find("#hotbar-page-controls").after(toAppend);
 }
 
-let app;
-
 function onBtnClick(ev) {
     ev.preventDefault();
 
-    if ( !app ) {
-        app = new GmAssistantApp();
-    }
-    app.render(true);
+    game.modules.get("intelligent-gm-assistant").api.launchApp();
 }

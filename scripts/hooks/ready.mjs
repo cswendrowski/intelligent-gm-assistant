@@ -1,5 +1,4 @@
 export async function ready() {
-
     await createOrGetThread();
 }
 

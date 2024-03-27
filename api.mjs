@@ -1,3 +1,5 @@
+import GmAssistantApp from "./scripts/apps/GmAssistantApp.mjs";
+
 export default class API {
 
     DEBUG = false;
@@ -10,6 +12,16 @@ export default class API {
         if ( !this._apiKey ) this.NEEDS_KEY = true;
         this._baseUrl = this.DEBUG ? "http://localhost:7245/api" :
             "https://intelligentnpcs.azurewebsites.net/api";
+    }
+
+    /* -------------------------------------------- */
+
+    app;
+    launchApp() {
+        if ( !this.app ) {
+            this.app = new GmAssistantApp();
+        }
+        this.app.render(true);
     }
 
     /* -------------------------------------------- */

@@ -43,6 +43,17 @@ export async function init() {
     });
 
     game.modules.get("intelligent-gm-assistant")["api"] = new API();
+
+    game.keybindings.register("intelligent-gm-assistant", "launch", {
+        name: "Launch Intelligent GM Assistant",
+        editable: [
+            {
+                key: "Slash",
+                modifiers: ["Control"]
+            }
+        ],
+        onDown: () => game.modules.get("intelligent-gm-assistant").api.launchApp()
+    });
 }
 
 function cleanText(text) {
